@@ -32,6 +32,7 @@ const cfns = [
 ];
 const expirationDateReferenceStart = "2023-05-01T14:48:00.000Z";
 const expirationDateReferenceEnd = "2024-04-30T14:48:00.000Z";
+
 const filterByCriteria = (database, criteria) => {
   let databaseAux = [];
   switch (criteria) {
@@ -53,7 +54,10 @@ const filterByCriteria = (database, criteria) => {
           databaseAux = [...databaseAux, ...filteredDBPartial];
         }
         return databaseAux;
-        case "byExpirationDate"
+        case "byExpirationDate":
+          const filteredDBPartial = database.filter((el) => {
+            return  moment(el["EXPIRATION DATE"]).isBetween(expirationDateReferenceStart, expirationDateReferenceEnd, undefined, '[]');
+          });
 
 
     default:
@@ -107,15 +111,17 @@ for (let index = 0; index < countries.length; index++) {
       "APPROVAL DATE": moment(new Date(el["APPROVAL DATE"])).format(
         "DD-MMM-YYYY"
       ),
-      "EXPIRATION DATE": moment(new Date(el["EXPIRATION DATE"])).format(
+      //comment if doin tracker by expiration date
+     /*  "EXPIRATION DATE": moment(new Date(el["EXPIRATION DATE"])).format(
         "DD-MMM-YYYY"
-      ),
+      ), */
     };
   });
   DB_FINAL = [...DB_FINAL, ...result];
 }
 
-let db_filtered = filterByCriteria(DB_FINAL, "byCFN");
+//here change condition to do tracker
+let db_filtered = filterByCriteria(DB_FINAL, "byExpirationDate");
 
 //no tocar
 var dbString = JSON.stringify(db_filtered);

@@ -1,0 +1,24 @@
+{
+  "name": "tracker",
+  "version": "1.0.0",
+  "description": "tracker for mdt databases",
+  "main": "tracker.js",
+  "dependencies": {
+    "convert-excel-to-json": "^1.7.0",
+    "moment": "^2.29.4"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/aeflorezm/trackerMDT.git"
+  },
+  "author": "Andres Florez",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/aeflorezm/trackerMDT/issues"
+  },
+  "homepage": "https://github.com/aeflorezm/trackerMDT#readme"
+}

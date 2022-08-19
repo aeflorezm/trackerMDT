@@ -7,16 +7,24 @@ var moment = require("moment");
 const fs = require("fs");
 
 //databases declaration
+const AR_DB1 = fs.readFileSync("../COV Argentina DB.xlsm");
+const AR_DB2 = fs.readFileSync("../MDT Argentina DB.xlsm");
+const AR_DB3 = fs.readFileSync("../OTROS Argentina DB.xlsm");
+const BO_DB = fs.readFileSync("../MDT Bolivia DB.xlsm");
 const CO_DB = fs.readFileSync("../MDT Colombia DB.xlsm");
 const CR_DB = fs.readFileSync("../MDT Costa Rica DB.xlsm");
 const EC_DB = fs.readFileSync("../MDT Ecuador DB.xlsm");
 const SV_DB = fs.readFileSync("../MDT El Salvador DB.xlsm");
 const GT_DB = fs.readFileSync("../MDT Guatemala DB.xlsm");
 const MX_DB = fs.readFileSync("../MDT Mexico DB.xlsm");
+const PE_DB = fs.readFileSync("../MDT Perú DB.xlsm");
+//
+
+//todo NI,HN
 
 
-const DB_LIST = [CO_DB, CR_DB, EC_DB, SV_DB, GT_DB, MX_DB];
-const countries = ["CO", "CR", "EC", "SV","GT","MX"];
+const DB_LIST = [AR_DB1,AR_DB2,AR_DB3,BO_DB,CO_DB, CR_DB, EC_DB, SV_DB, GT_DB, MX_DB,PE_DB];
+const countries = ["AR","AR","AR","BO","CO", "CR", "EC", "SV","GT","MX","PE"];
 
 //possible parameters
 const cfns = [
@@ -30,8 +38,8 @@ const cfns = [
   "MMT-7736",
   "MMT-7715",
 ];
-const expirationDateReferenceStart = "2023-05-01T14:48:00.000Z";
-const expirationDateReferenceEnd = "2024-04-30T14:48:00.000Z";
+const expirationDateReferenceStart = "2023-05-01T05:00:16.000Z";
+const expirationDateReferenceEnd = "2024-04-30T05:00:16.000Z";
 
 const filterByCriteria = (database, criteria) => {
   let databaseAux = [];
@@ -58,7 +66,8 @@ const filterByCriteria = (database, criteria) => {
           const filteredDBPartial = database.filter((el) => {
             return  moment(el["EXPIRATION DATE"]).isBetween(expirationDateReferenceStart, expirationDateReferenceEnd, undefined, '[]');
           });
-
+          databaseAux = [...databaseAux, ...filteredDBPartial];
+          return databaseAux;
 
     default:
       break;
@@ -108,13 +117,6 @@ for (let index = 0; index < countries.length; index++) {
     return {
       ...el,
       COUNTRY: countries[index],
-      "APPROVAL DATE": moment(new Date(el["APPROVAL DATE"])).format(
-        "DD-MMM-YYYY"
-      ),
-      //comment if doin tracker by expiration date
-     /*  "EXPIRATION DATE": moment(new Date(el["EXPIRATION DATE"])).format(
-        "DD-MMM-YYYY"
-      ), */
     };
   });
   DB_FINAL = [...DB_FINAL, ...result];
@@ -122,6 +124,20 @@ for (let index = 0; index < countries.length; index++) {
 
 //here change condition to do tracker
 let db_filtered = filterByCriteria(DB_FINAL, "byExpirationDate");
+
+db_filtered =db_filtered.map((el) =>{
+  return{
+    ...el,
+      "APPROVAL DATE": moment(new Date(el["APPROVAL DATE"])).format(
+        "DD-MMM-YYYY"
+      ),
+      "EXPIRATION DATE": moment(new Date(el["EXPIRATION DATE"])).format(
+        "DD-MMM-YYYY"
+      ),
+  }
+}
+
+)
 
 //no tocar
 var dbString = JSON.stringify(db_filtered);

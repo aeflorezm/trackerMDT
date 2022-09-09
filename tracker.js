@@ -115,6 +115,7 @@ const headingColumnNames = [
   "STATUS",
   "REGISTRATION NAME",
   "LICENSE HOLDER",
+  "COUNTRY"
 ];
 let DB_FINAL = [];
 //no tocar
@@ -187,6 +188,7 @@ db_filtered = db_filtered.map((el) => {
       "EXPIRATION DATE": moment(new Date(el["EXPIRATION DATE"]))
         .format("DD-MMM-YYYY")
         .toString(),
+        COUNTRY: el["COUNTRY"].toString(),
     };
   } catch (error) {
     JSON.stringify(error);
@@ -205,23 +207,24 @@ let headingColumnIndex = 1;
 headingColumnNames.forEach((heading) => {
   ws.cell(1, headingColumnIndex++).string(heading);
 });
+let errorArray =[];
 //Write Data in Excel file
 let rowIndex = 2;
-db_filtered.forEach((record) => {
+db_filtered.forEach((record,index) => {
   try {
     let columnIndex = 1;
-  Object.keys(record).forEach((columnName) => {
-    ws.cell(rowIndex, columnIndex++).string(record[columnName]);
-  });
-  rowIndex++;
+    Object.keys(record).forEach((columnName) => {
+      ws.cell(rowIndex, columnIndex++).string(record[columnName]);
+    });
+    rowIndex++;
   } catch (error) {
-     console.log(error);
-     console.log(record)
+    console.log(error);
+    console.log(record);
+    errorArray.push({error:error,index:index, record:record})
   }
-  
 });
 wb.write("tracker.xlsx");
-
+console.log(JSON.stringify(errorArray));
 //kpis measurement and RAD strategies and team organization
 //presentacion para que las persona se presenten
 //topics

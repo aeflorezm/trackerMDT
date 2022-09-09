@@ -1,10 +1,11 @@
-"use strict";
 //no tocar
 const excelToJson = require("convert-excel-to-json");
-//no tocar
 var moment = require("moment");
-//no tocar
 const fs = require("fs");
+var xl = require("excel4node");
+var wb = new xl.Workbook();
+var ws = wb.addWorksheet("Sheet 1");
+//
 
 //databases declaration
 const AR_DB1 = fs.readFileSync("../COV Argentina DB.xlsm");
@@ -22,9 +23,32 @@ const PE_DB = fs.readFileSync("../MDT Perú DB.xlsm");
 
 //todo NI,HN
 
-
-const DB_LIST = [AR_DB1,AR_DB2,AR_DB3,BO_DB,CO_DB, CR_DB, EC_DB, SV_DB, GT_DB, MX_DB,PE_DB];
-const countries = ["AR","AR","AR","BO","CO", "CR", "EC", "SV","GT","MX","PE"];
+const DB_LIST = [
+  AR_DB1,
+  AR_DB2,
+  AR_DB3,
+  BO_DB,
+  CO_DB,
+  CR_DB,
+  EC_DB,
+  SV_DB,
+  GT_DB,
+  MX_DB,
+  PE_DB,
+];
+const countries = [
+  "AR",
+  "AR",
+  "AR",
+  "BO",
+  "CO",
+  "CR",
+  "EC",
+  "SV",
+  "GT",
+  "MX",
+  "PE",
+];
 
 //possible parameters
 const cfns = [
@@ -33,7 +57,7 @@ const cfns = [
   "MMT-7910",
   "MMT-7911",
   "MMT-7820",
-  "MMT-7821",  
+  "MMT-7821",
   "MMT-7512",
   "MMT-7736",
   "MMT-7715",
@@ -54,28 +78,45 @@ const filterByCriteria = (database, criteria) => {
 
       return databaseAux;
 
-      case "byCFNSuffix":
-        for (let index = 0; index < cfns.length; index++) {
-          const filteredDBPartial = database.filter((el) => {
-            return  cfns[index].includes(el.CFN);
-          });
-          databaseAux = [...databaseAux, ...filteredDBPartial];
-        }
-        return databaseAux;
-        case "byExpirationDate":
-          const filteredDBPartial = database.filter((el) => {
-            return  moment(el["EXPIRATION DATE"]).isBetween(expirationDateReferenceStart, expirationDateReferenceEnd, undefined, '[]');
-          });
-          databaseAux = [...databaseAux, ...filteredDBPartial];
-          return databaseAux;
+    case "byCFNSuffix":
+      for (let index = 0; index < cfns.length; index++) {
+        const filteredDBPartial = database.filter((el) => {
+          return cfns[index].includes(el.CFN);
+        });
+        databaseAux = [...databaseAux, ...filteredDBPartial];
+      }
+      return databaseAux;
+    case "byExpirationDate":
+      const filteredDBPartial = database.filter((el) => {
+        return moment(el["EXPIRATION DATE"]).isValid()
+          ? moment(el["EXPIRATION DATE"]).isBetween(
+              expirationDateReferenceStart,
+              expirationDateReferenceEnd,
+              undefined,
+              "[]"
+            )
+          : "INVALID";
+      });
+      databaseAux = [...databaseAux, ...filteredDBPartial];
+      return databaseAux;
 
     default:
       break;
   }
 };
-
+const headingColumnNames = [
+  "CFN",
+  "TREATED CFN",
+  "CFN DESCRIPTION",
+  "OU",
+  "REGISTRATION NUMBER",
+  "APPROVAL DATE",
+  "EXPIRATION DATE",
+  "STATUS",
+  "REGISTRATION NAME",
+  "LICENSE HOLDER",
+];
 let DB_FINAL = [];
-
 //no tocar
 for (let index = 0; index < countries.length; index++) {
   let result = excelToJson({
@@ -123,21 +164,34 @@ for (let index = 0; index < countries.length; index++) {
 }
 
 //here change condition to do tracker
+//
+//byExpirationDate
 let db_filtered = filterByCriteria(DB_FINAL, "byExpirationDate");
 
-db_filtered =db_filtered.map((el) =>{
-  return{
-    ...el,
-      "APPROVAL DATE": moment(new Date(el["APPROVAL DATE"])).format(
-        "DD-MMM-YYYY"
-      ),
-      "EXPIRATION DATE": moment(new Date(el["EXPIRATION DATE"])).format(
-        "DD-MMM-YYYY"
-      ),
+db_filtered = db_filtered.map((el) => {
+  try {
+    return {
+      CFN: el["CFN"].toString(),
+      "TREATED CFN": el["TREATED CFN"].toString(),
+      "CFN DESCRIPTION": el["CFN DESCRIPTION"].toString(),
+      OU: el["OU"].toString(),
+      "REGISTRATION NUMBER": el["REGISTRATION NUMBER"].toString(),
+      "APPROVAL DATE": el["APPROVAL DATE"].toString(),
+      "EXPIRATION DATE": el["EXPIRATION DATE"].toString(),
+      STATUS: el["STATUS"].toString(),
+      "REGISTRATION NAME": el["REGISTRATION NAME"].toString(),
+      "LICENSE HOLDER": el["LICENSE HOLDER"].toString(),
+      "APPROVAL DATE": moment(new Date(el["APPROVAL DATE"]))
+        .format("DD-MMM-YYYY")
+        .toString(),
+      "EXPIRATION DATE": moment(new Date(el["EXPIRATION DATE"]))
+        .format("DD-MMM-YYYY")
+        .toString(),
+    };
+  } catch (error) {
+    JSON.stringify(error);
   }
-}
-
-)
+});
 
 //no tocar
 var dbString = JSON.stringify(db_filtered);
@@ -146,3 +200,33 @@ fs.writeFile("database.json", dbString, (err) => {
     console.error(err);
   }
 });
+//Write Column Title in Excel file
+let headingColumnIndex = 1;
+headingColumnNames.forEach((heading) => {
+  ws.cell(1, headingColumnIndex++).string(heading);
+});
+//Write Data in Excel file
+let rowIndex = 2;
+db_filtered.forEach((record) => {
+  try {
+    let columnIndex = 1;
+  Object.keys(record).forEach((columnName) => {
+    ws.cell(rowIndex, columnIndex++).string(record[columnName]);
+  });
+  rowIndex++;
+  } catch (error) {
+     console.log(error);
+     console.log(record)
+  }
+  
+});
+wb.write("tracker.xlsx");
+
+//kpis measurement and RAD strategies and team organization
+//presentacion para que las persona se presenten
+//topics
+//data engieenering
+//dynamodb
+//ocr automations
+//artificial intelligence project
+//time savings

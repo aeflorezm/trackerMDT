@@ -5,6 +5,7 @@
   "main": "tracker.js",
   "dependencies": {
     "convert-excel-to-json": "^1.7.0",
+    "excel4node": "^1.8.0",
     "moment": "^2.29.4"
   },
   "devDependencies": {},

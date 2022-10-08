@@ -2,7 +2,6 @@ var moment = require("moment");
 const processBRFormat = (database) =>{
   let db_processed = database.map((el) => {
     try {
-      console.log(database[0])
       return {
         CFN: el["Código"].toString(),
         "TREATED CFN": el["Código Tratado"].toString(),

@@ -9,19 +9,26 @@ const GeneralServices = require("./services/BRService");
 //
 
 //databases declaration
-const AR_DB1 = fs.readFileSync("../COV Argentina DB.xlsm");
-const AR_DB2 = fs.readFileSync("../MDT Argentina DB.xlsm");
-const AR_DB3 = fs.readFileSync("../OTROS Argentina DB.xlsm");
-const BO_DB = fs.readFileSync("../MDT Bolivia DB.xlsm");
-const CO_DB = fs.readFileSync("../MDT Colombia DB.xlsm");
-const CR_DB = fs.readFileSync("../MDT Costa Rica DB.xlsm");
-const EC_DB = fs.readFileSync("../MDT Ecuador DB.xlsm");
-const SV_DB = fs.readFileSync("../MDT El Salvador DB.xlsm");
-const GT_DB = fs.readFileSync("../MDT Guatemala DB.xlsm");
-const MX_DB = fs.readFileSync("../MDT Mexico DB.xlsm");
-const PE_DB = fs.readFileSync("../MDT Perú DB.xlsm");
-const BR_COV = fs.readFileSync("../Piloto Oficial_COV_2020.05.22.xlsm");
-const BR_MDT = fs.readFileSync("../Piloto Oficial_MDT_2020.06.08.xlsm");
+const AR_DB1 = fs.readFileSync("../MDT BD ARGENTINA/COV Argentina DB.xlsm");
+const AR_DB2 = fs.readFileSync("../MDT BD ARGENTINA/MDT Argentina DB.xlsm");
+const AR_DB3 = fs.readFileSync("../MDT BD ARGENTINA/OTROS Argentina DB.xlsm");
+const BO_DB = fs.readFileSync("../MDT BD BOLIVIA/MDT BD BOLIVIA.xlsm");
+const BR_COV = fs.readFileSync(
+  "../MDT BD BRAZIL/Piloto Oficial_COV_2020.05.22.xlsm"
+);
+const BR_MDT = fs.readFileSync(
+  "../MDT BD BRAZIL/Piloto Oficial_MDT_2020.06.08.xlsm"
+);
+const CO_DB = fs.readFileSync("../MDT BD COLOMBIA/MDT BD COLOMBIA.xlsm");
+const CR_DB = fs.readFileSync("../MDT BD COSTA RICA/MDT BD COSTA RICA.xlsm");
+const EC_DB = fs.readFileSync("../MDT BD ECUADOR/MDT BD ECUADOR.xlsm");
+const SV_DB = fs.readFileSync("../MDT BD EL SALVADOR/MDT BD EL SALVADOR.xlsm");
+const GT_DB = fs.readFileSync("../MDT BD GUATEMALA/MDT BD GUATEMALA.xlsm");
+const MX_DB = fs.readFileSync("../MDT BD MEXICO/MDT BD MEXICO.xlsm");
+const PE_DB = fs.readFileSync("../MDT BD PERU/MDT BD PERU.xlsm");
+const UY_DB = fs.readFileSync("../MDT BD URUGUAY/MDT BD URUGUAY.xlsm");
+const VE_DB = fs.readFileSync("../MDT BD VENEZUELA/MDT BD VENEZUELA.xlsm");
+
 //
 
 //todo NI,HN
@@ -38,11 +45,9 @@ const DB_LIST = [
   GT_DB,
   MX_DB,
   PE_DB,
+  VE_DB,
 ];
-const BR_LIST = [
-  BR_COV,
-  BR_MDT
-]
+const BR_LIST = [BR_COV, BR_MDT];
 const countries = [
   "AR",
   "AR",
@@ -55,11 +60,11 @@ const countries = [
   "GT",
   "MX",
   "PE",
+  "VE",
 ];
-const countries_aux =[
-  "BR",
-  "BR"
-]
+const countries_aux = ["BR", "BR"];
+const UY_LIST = [UY_DB];
+const countries_aux2 = ["UY"];
 
 //possible parameters
 const cfns = [
@@ -237,8 +242,6 @@ const cfns = [
 const expirationDateReferenceStart = "2023-05-01T05:00:16.000Z";
 const expirationDateReferenceEnd = "2024-04-30T05:00:16.000Z";
 
-
-
 const filterByCriteria = (database, criteria) => {
   let databaseAux = [];
   switch (criteria) {
@@ -289,26 +292,27 @@ const headingColumnNames = [
   "LICENSE HOLDER",
   "APPROVAL DATE",
   "EXPIRATION DATE",
-  "COUNTRY"
+  "COUNTRY",
 ];
 let DB_FINAL = [];
 let DB_FINAL_BR = [];
-//no tocar
+let DB_FINAL_UY = [];
+//no tocar BR import DB
 for (let index = 0; index < BR_LIST.length; index++) {
   let result_aux = excelToJson({
     source: BR_LIST[index],
     sheets: ["Banco de Dados"],
     columnToKey: {
       D: "Código",
-      E: "Código Tratado",	
+      E: "Código Tratado",
       F: "BU",
-      G: "Registro ANVISA",	
+      G: "Registro ANVISA",
       I: "Data de Aprovação Inicial",
       J: "Data de Vencimento do Registro",
-      K:"Nome do Registro",
-      L: "Descrição do Código", 
-      M: "Status do Registro", 
-      AK:"Detentor do Registro"
+      K: "Nome do Registro",
+      L: "Descrição do Código",
+      M: "Status do Registro",
+      AK: "Detentor do Registro",
     },
     header: {
       rows: 1,
@@ -321,6 +325,52 @@ for (let index = 0; index < BR_LIST.length; index++) {
     };
   });
   DB_FINAL_BR = [...DB_FINAL_BR, ...result_aux];
+}
+//no tocar UY import DB
+for (let index = 0; index < countries_aux2.length; index++) {
+  let result_uy = excelToJson({
+    source: UY_LIST[index],
+    sheets: ["ACTIVE CODES"],
+    columnToKey: {
+      /* A: 'COUNT', */
+      B: "CFN",
+      C: "TREATED CFN",
+      D: "OU",
+      E: "REGISTRATION NUMBER",
+      F: "APPROVAL DATE",
+      G: "EXPIRATION DATE",
+      H: "STATUS",
+      I: "REGISTRATION NAME",
+      J: "LICENSE HOLDER",
+      //K: "",
+      /*  L: 'FID',
+            M: 'MANUFACTURING SITE',
+            N: 'MANUFACTURING COUNTRY',
+            O: 'RISK CLASSIFICATION',
+            P: 'COMMERCIAL PRESENTATION',
+            Q: 'SHELF LIFE',
+            R: 'LEGACY',
+            S: 'COMMENTS',
+            T: 'IMPORTADOR',
+            U: 'ACONDICIONADOR',
+            V: 'CONDICIONES DE ALMACENAMIENTO',
+            W: 'EXPEDIENTE',
+            X: 'NÚMERO RESOLUCIÓN',
+            Y: 'MARCA',
+            Z: 'PRESENTE EN REGISTRO' */
+    },
+    header: {
+      rows: 1,
+    },
+  });
+  result_uy = result_uy["ACTIVE CODES"].map((el) => {
+    return {
+      ...el,
+      COUNTRY: countries_aux2[index],
+      "CFN DESCRIPTION": "NA",
+    };
+  });
+  DB_FINAL_UY = [...DB_FINAL_UY, ...result_uy];
 }
 //no tocar
 for (let index = 0; index < countries.length; index++) {
@@ -371,49 +421,60 @@ for (let index = 0; index < countries.length; index++) {
 //here change condition to do tracker
 //
 //byExpirationDate
+DB_FINAL = [...DB_FINAL, ...DB_FINAL_UY];
 let db_filtered = filterByCriteria(DB_FINAL, "byCFN");
-let db_filtered_br = GeneralServices.processBrazil(DB_FINAL_BR,"byCFN", cfns);
+let db_filtered_br = GeneralServices.processBrazil(DB_FINAL_BR, "byCFN", cfns);
 db_filtered = db_filtered.map((el) => {
   try {
     return {
-      CFN: el["CFN"].toString(),
-      "TREATED CFN": el["TREATED CFN"].toString(),
-      "CFN DESCRIPTION": el["CFN DESCRIPTION"].toString(),
-      OU: el["OU"].toString(),
-      "REGISTRATION NUMBER": el["REGISTRATION NUMBER"].toString(),
-      STATUS: el["STATUS"].toString(),
-      "REGISTRATION NAME": el["REGISTRATION NAME"].toString(),
-      "LICENSE HOLDER": el["LICENSE HOLDER"].toString(),
-      "APPROVAL DATE": moment(new Date(el["APPROVAL DATE"]))
-        .format("DD-MMM-YYYY")
-        .toString(),
-      "EXPIRATION DATE": moment(new Date(el["EXPIRATION DATE"]))
-        .format("DD-MMM-YYYY")
-        .toString(),
-        COUNTRY: el["COUNTRY"].toString(),
+      CFN: el["CFN"] ? el["CFN"].toString() : "NULL",
+      "TREATED CFN": el["TREATED CFN"] ? el["TREATED CFN"].toString() : "NULL",
+      "CFN DESCRIPTION": el["CFN DESCRIPTION"]
+        ? el["CFN DESCRIPTION"].toString()
+        : "NULL",
+      OU: el["OU"] ? el["OU"].toString() : "NULL",
+      "REGISTRATION NUMBER": el["REGISTRATION NUMBER"]
+        ? el["REGISTRATION NUMBER"].toString()
+        : "NULL",
+      STATUS: el["STATUS"] ? el["STATUS"].toString() : "NULL",
+      "REGISTRATION NAME": el["REGISTRATION NAME"]
+        ? el["REGISTRATION NAME"].toString()
+        : "NULL",
+      "LICENSE HOLDER": el["LICENSE HOLDER"]
+        ? el["LICENSE HOLDER"].toString()
+        : "NULL",
+      "APPROVAL DATE": el["APPROVAL DATE"]
+        ? moment(new Date(el["APPROVAL DATE"])).format("DD-MMM-YYYY").toString()
+        : "NULL",
+      "EXPIRATION DATE": el["EXPIRATION DATE"]
+        ? moment(new Date(el["EXPIRATION DATE"]))
+            .format("DD-MMM-YYYY")
+            .toString()
+        : "NULL",
+      COUNTRY: el["COUNTRY"] ? el["COUNTRY"].toString() : "NULL",
     };
   } catch (error) {
-    console.log("error normal")
-    console.log(error)
+    console.log("error normal");
+    console.log(error);
   }
 });
-let db_final =[...db_filtered,...db_filtered_br]
+let db_final = [...db_filtered, ...db_filtered_br];
 //no tocar
-var dbString = JSON.stringify(db_final);
+/* var dbString = JSON.stringify(db_final);
 fs.writeFile("database.json", dbString, (err) => {
   if (err) {
     console.error(err);
   }
-});
+}); */
 //Write Column Title in Excel file
 let headingColumnIndex = 1;
 headingColumnNames.forEach((heading) => {
   ws.cell(1, headingColumnIndex++).string(heading);
 });
-let errorArray =[];
+let errorArray = [];
 //Write Data in Excel file
 let rowIndex = 2;
-db_final.forEach((record,index) => {
+db_final.forEach((record, index) => {
   try {
     let columnIndex = 1;
     Object.keys(record).forEach((columnName) => {
@@ -422,8 +483,7 @@ db_final.forEach((record,index) => {
     rowIndex++;
   } catch (error) {
     console.log(error);
-    console.log(record);
-    errorArray.push({error:error,index:index, record:record})
+    errorArray.push({ error: error, index: index, record: record });
   }
 });
 wb.write("tracker.xlsx");

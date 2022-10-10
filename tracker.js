@@ -9,21 +9,51 @@ const GeneralServices = require("./services/BRService");
 //
 
 //databases declaration
-const AR_DB1 = fs.readFileSync("../Regulatory Affairs Repository - Documents/MDT BD ARGENTINA/COV Argentina DB.xlsm");
-const AR_DB2 = fs.readFileSync("../Regulatory Affairs Repository - Documents/MDT BD ARGENTINA/MDT Argentina DB.xlsm");
-const AR_DB3 = fs.readFileSync("../Regulatory Affairs Repository - Documents/MDT BD ARGENTINA/OTROS Argentina DB.xlsm");
-const BO_DB = fs.readFileSync("../Regulatory Affairs Repository - Documents/MDT BD BOLIVIA/MDT BD BOLIVIA.xlsm");
-const BR_COV = fs.readFileSync("../Regulatory Affairs Repository - Documents/MDT BD BRAZIL/Piloto Oficial_COV_2020.05.22.xlsm");
-const BR_MDT = fs.readFileSync("../Regulatory Affairs Repository - Documents/MDT BD BRAZIL/Piloto Oficial_MDT_2020.06.08.xlsm");
-const CO_DB = fs.readFileSync("../Regulatory Affairs Repository - Documents/MDT BD COLOMBIA/MDT BD COLOMBIA.xlsm");
-const CR_DB = fs.readFileSync("../Regulatory Affairs Repository - Documents/MDT BD COSTA RICA/MDT BD COSTA RICA.xlsm");
-const EC_DB = fs.readFileSync("../Regulatory Affairs Repository - Documents/MDT BD ECUADOR/MDT BD ECUADOR.xlsm");
-const SV_DB = fs.readFileSync("../Regulatory Affairs Repository - Documents/MDT BD EL SALVADOR/MDT BD EL SALVADOR.xlsm");
-const GT_DB = fs.readFileSync("../Regulatory Affairs Repository - Documents/MDT BD GUATEMALA/MDT BD GUATEMALA.xlsm");
-const MX_DB = fs.readFileSync("../Regulatory Affairs Repository - Documents/MDT BD MEXICO/MDT BD MEXICO.xlsm");
-const PE_DB = fs.readFileSync("../Regulatory Affairs Repository - Documents/MDT BD PERU/MDT BD PERU.xlsm");
-const UY_DB = fs.readFileSync("../Regulatory Affairs Repository - Documents/MDT BD URUGUAY/MDT BD URUGUAY.xlsm");
-const VE_DB = fs.readFileSync("../Regulatory Affairs Repository - Documents/MDT BD VENEZUELA/MDT BD VENEZUELA.xlsm");
+const AR_DB1 = fs.readFileSync(
+  "../Regulatory Affairs Repository - Documents/MDT BD ARGENTINA/COV Argentina DB.xlsm"
+);
+const AR_DB2 = fs.readFileSync(
+  "../Regulatory Affairs Repository - Documents/MDT BD ARGENTINA/MDT Argentina DB.xlsm"
+);
+const AR_DB3 = fs.readFileSync(
+  "../Regulatory Affairs Repository - Documents/MDT BD ARGENTINA/OTROS Argentina DB.xlsm"
+);
+const BO_DB = fs.readFileSync(
+  "../Regulatory Affairs Repository - Documents/MDT BD BOLIVIA/MDT BD BOLIVIA.xlsm"
+);
+const BR_COV = fs.readFileSync(
+  "../Regulatory Affairs Repository - Documents/MDT BD BRAZIL/Piloto Oficial_COV_2020.05.22.xlsm"
+);
+const BR_MDT = fs.readFileSync(
+  "../Regulatory Affairs Repository - Documents/MDT BD BRAZIL/Piloto Oficial_MDT_2020.06.08.xlsm"
+);
+const CO_DB = fs.readFileSync(
+  "../Regulatory Affairs Repository - Documents/MDT BD COLOMBIA/MDT BD COLOMBIA.xlsm"
+);
+const CR_DB = fs.readFileSync(
+  "../Regulatory Affairs Repository - Documents/MDT BD COSTA RICA/MDT BD COSTA RICA.xlsm"
+);
+const EC_DB = fs.readFileSync(
+  "../Regulatory Affairs Repository - Documents/MDT BD ECUADOR/MDT BD ECUADOR.xlsm"
+);
+const SV_DB = fs.readFileSync(
+  "../Regulatory Affairs Repository - Documents/MDT BD EL SALVADOR/MDT BD EL SALVADOR.xlsm"
+);
+const GT_DB = fs.readFileSync(
+  "../Regulatory Affairs Repository - Documents/MDT BD GUATEMALA/MDT BD GUATEMALA.xlsm"
+);
+const MX_DB = fs.readFileSync(
+  "../Regulatory Affairs Repository - Documents/MDT BD MEXICO/MDT BD MEXICO.xlsm"
+);
+const PE_DB = fs.readFileSync(
+  "../Regulatory Affairs Repository - Documents/MDT BD PERU/MDT BD PERU.xlsm"
+);
+const UY_DB = fs.readFileSync(
+  "../Regulatory Affairs Repository - Documents/MDT BD URUGUAY/MDT BD URUGUAY.xlsm"
+);
+const VE_DB = fs.readFileSync(
+  "../Regulatory Affairs Repository - Documents/MDT BD VENEZUELA/MDT BD VENEZUELA.xlsm"
+);
 
 //
 
@@ -64,6 +94,16 @@ const countries_aux2 = ["UY"];
 
 //possible parameters
 const cfns = [
+  "Z6134300",
+  "999",
+  "XL845",
+  "XL844",
+  "XL843",
+  "980NEB",
+  "980NEBES",
+  "980HFO2T-MFG",
+  "980IESYNC-MFG",
+  "980NIVPLUS-MFG",
   "CB10012",
   "CB1351",
   "CB20012",
@@ -418,8 +458,14 @@ for (let index = 0; index < countries.length; index++) {
 //byCFN
 //byExpirationDate
 DB_FINAL = [...DB_FINAL, ...DB_FINAL_UY];
-let db_filtered = filterByCriteria(DB_FINAL, "byExpirationDate");
-let db_filtered_br = GeneralServices.processBrazil(DB_FINAL_BR, "byExpirationDate", cfns,expirationDateReferenceStart,expirationDateReferenceEnd);
+let db_filtered = filterByCriteria(DB_FINAL, "byCFN");
+let db_filtered_br = GeneralServices.processBrazil(
+  DB_FINAL_BR,
+  "byCFN",
+  cfns,
+  expirationDateReferenceStart,
+  expirationDateReferenceEnd
+);
 db_filtered = db_filtered.map((el) => {
   try {
     return {

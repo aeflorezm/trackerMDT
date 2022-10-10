@@ -244,7 +244,7 @@ const filterByCriteria = (database, criteria) => {
     case "byCFN":
       for (let index = 0; index < cfns.length; index++) {
         const filteredDBPartial = database.filter((el) => {
-          return el.CFN === cfns[index];
+          return el["CFN"].toString().trim() === cfns[index].toString().trim();
         });
         databaseAux = [...databaseAux, ...filteredDBPartial];
       }
@@ -415,11 +415,11 @@ for (let index = 0; index < countries.length; index++) {
 }
 
 //here change condition to do tracker
-//
+//byCFN
 //byExpirationDate
 DB_FINAL = [...DB_FINAL, ...DB_FINAL_UY];
 let db_filtered = filterByCriteria(DB_FINAL, "byExpirationDate");
-let db_filtered_br = GeneralServices.processBrazil(DB_FINAL_BR, "byExpirationDate", cfns);
+let db_filtered_br = GeneralServices.processBrazil(DB_FINAL_BR, "byExpirationDate", cfns,expirationDateReferenceStart,expirationDateReferenceEnd);
 db_filtered = db_filtered.map((el) => {
   try {
     return {
